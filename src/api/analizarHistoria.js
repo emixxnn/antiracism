@@ -1,6 +1,6 @@
 export async function analizarHistoria(textoUsuario) {
 
-  const WEBHOOK_URL = "https://n8n-production-f859.up.railway.app/webhook-test/racismo-story";
+  const WEBHOOK_URL = "https://n8n-production-f859.up.railway.app/webhook/racismo-story";
 
   try {
 

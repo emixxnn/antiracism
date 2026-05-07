@@ -14,6 +14,10 @@ app.innerHTML = `
 
     <section class="hero">
 
+      <div class="badge">
+        IA + D3.js + Visualización emocional
+      </div>
+
       <h1>
         Visualizando el Racismo en el Deporte con IA
       </h1>
@@ -45,7 +49,15 @@ async function cargarHistorias() {
 
   const historias = await obtenerHistorias();
 
-  renderizarHistorias(historias);
+  if (Array.isArray(historias)) {
+
+      renderizarHistorias(historias);
+
+    } else {
+
+      console.error("Historias inválidas:", historias);
+
+}
 
 }
 

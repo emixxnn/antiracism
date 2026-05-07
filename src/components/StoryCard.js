@@ -6,63 +6,95 @@ export function renderizarHistorias(historias) {
 
   container.innerHTML = "";
 
-  historias.reverse().forEach((historia, index) => {
+  // Protección por si no llega array
+  if (!Array.isArray(historias)) {
 
-    const card = document.createElement("div");
+    console.error("Historias no es un array:", historias);
+    return;
 
-    card.classList.add("story-card");
+  }
 
-    card.innerHTML = `
+  historias
+    .slice()
+    .reverse()
+    .forEach((historia, index) => {
 
-      <div class="story-content">
+      // Convertir emotions si llega como string
+      const emociones =
+        typeof historia.emotions === "string"
+          ? JSON.parse(historia.emotions)
+          : historia.emotions;
 
-        <div class="story-text">
+      const card = document.createElement("div");
 
-          <h3>Resumen emocional</h3>
+      card.classList.add("story-card");
 
-          <p>${historia.summary}</p>
+      card.innerHTML = `
 
-          <div id="chart-${index}" class="mini-chart"></div>
+        <div class="story-content">
+
+          <div class="story-text">
+
+            <h3>Resumen emocional</h3>
+
+            <p>${historia.summary}</p>
+
+            <div id="chart-${index}" class="mini-chart"></div>
+
+          </div>
+
+          <div class="story-image-container">
+
+            <img
+              src="data:image/png;base64,${historia.imageBase64}"
+              class="story-image"
+            />
+
+          </div>
 
         </div>
 
-        <div class="story-image-container">
+      `;
 
-          <img
-            src="data:image/png;base64,${historia.imageBase64}"
-            class="story-image"
-          />
+      container.appendChild(card);
 
-        </div>
+      renderizarMiniGrafica(
+        emociones,
+        `#chart-${index}`
+      );
 
-      </div>
-
-    `;
-
-    container.appendChild(card);
-
-    renderizarMiniGrafica(
-      historia.emotions,
-      `#chart-${index}`
-    );
-
-  });
+    });
 
 }
 
 function renderizarMiniGrafica(emotions, selector) {
 
+  const traducciones = {
+
+    anger: "enojo",
+    sadness: "tristeza",
+    fear: "miedo",
+    frustration: "frustración",
+    hope: "esperanza"
+
+  };
+
   const data = Object.entries(emotions).map(([key, value]) => ({
-    emotion: key,
+
+    emotion: traducciones[key] || key,
+    originalEmotion: key,
     value: value,
+
   }));
 
   const colores = {
+
     anger: "#ff4d4d",
     sadness: "#4d79ff",
     fear: "#9966cc",
     frustration: "#ff9933",
     hope: "#66cc66",
+
   };
 
   const width = 300;
@@ -94,7 +126,7 @@ function renderizarMiniGrafica(emotions, selector) {
     .attr("y", (d) => y(d.value))
     .attr("width", x.bandwidth())
     .attr("height", (d) => height - 20 - y(d.value))
-    .attr("fill", (d) => colores[d.emotion]);
+    .attr("fill", (d) => colores[d.originalEmotion]);
 
   svg
     .selectAll("text")
